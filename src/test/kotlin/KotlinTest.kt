@@ -1,3 +1,5 @@
+import java.util.*
+import kotlin.reflect.*
 
 inline fun <reified T> value(): T? {
     return when (T::class) {
@@ -16,15 +18,70 @@ fun genericTest() {
     println(b)
 }
 
-object Single {}
+object Single
 
 fun Single.describe() {
     println("The single object")
 }
 
+fun extensionTest() {
+    Single.describe()
+}
+
+fun functionTest() {
+    fun add(x: Int, y: Int): Int {
+        return x + y
+    }
+
+    val add1 = fun(x: Int, y: Int): Int {
+        return x + y
+    }
+    val add2 = { x: Int, y: Int -> x + y }
+    add(y = 2, x = 1)
+    /*
+    error:
+    add1(y = 2, x = 1)
+    add2(y = 2, x = 1)
+    */
+}
+
+fun classTest() {
+    class Test
+
+}
+
+fun randomBool(): Boolean = Random().nextInt() % 2 == 1
+
+fun controlFlowTest() {
+    val c = if (randomBool()) 'b' else null
+    println(c)
+}
+
+fun iterateMethods(any: Any) = sequence {
+    when (any) {
+        is KClass<*> -> {
+            any.javaObjectType.methods
+        }
+        else -> {
+            any.javaClass.methods
+        }
+    }.map {
+        it.name
+    }.sorted().forEach {
+        yield(it)
+    }
+}
+
+fun iterateTest() {
+    println("-".repeat(30))
+    for (m in iterateMethods(Int::class)) println(m)
+    println("-".repeat(30))
+    for (m in iterateMethods(1)) println(m)
+}
+
 fun main() {
     genericTest()
-    Single.describe()
-
-    "abc".also {  }
+    extensionTest()
+    controlFlowTest()
+    iterateTest()
 }
