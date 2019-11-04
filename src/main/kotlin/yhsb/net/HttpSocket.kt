@@ -66,7 +66,7 @@ class HttpSocket(
         val header = HttpHeader()
         while (true) {
             val line = readLine()
-            if (line == "") break;
+            if (line == "") break
             val i = line.indexOf(':')
             if (i > 0) {
                 val key = line.substring(0, i).trim()
