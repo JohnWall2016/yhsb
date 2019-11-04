@@ -1,3 +1,4 @@
+import java.lang.Exception
 import java.util.*
 import kotlin.reflect.*
 
@@ -45,9 +46,27 @@ fun functionTest() {
     */
 }
 
-fun classTest() {
-    class Test
+class Person(name: String, age: Int) {
+    private var _age = age
+    val name = name
+    var age get() = _age
+        set(value) {
+            if (value < 0) throw Exception("Age can't less than 0")
+            _age = value
+        }
 
+    constructor() : this("", 0) {
+    }
+
+    override fun toString(): String {
+        return "Person: $name, $age"
+    }
+}
+
+fun classTest() {
+
+    println(Person("John", 21))
+    println(Person())
 }
 
 fun randomBool(): Boolean = Random().nextInt() % 2 == 1
@@ -80,8 +99,9 @@ fun iterateTest() {
 }
 
 fun main() {
-    genericTest()
-    extensionTest()
-    controlFlowTest()
-    iterateTest()
+//    genericTest()
+//    extensionTest()
+//    controlFlowTest()
+//    iterateTest()
+    classTest()
 }
