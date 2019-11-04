@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream
 import java.io.Closeable
 import java.net.Socket
 import java.nio.charset.Charset
+import kotlin.sequences.iterator
 
 class HttpSocket(
     private val ip: String,
@@ -130,11 +131,11 @@ class HttpHeader : Iterable<Map.Entry<String, List<String>>> {
 
     operator fun get(key: String) = headers[key]
 
-    override fun iterator() = sequence {
+    override fun iterator() = iterator {
         headers.forEach {
             yield(it)
         }
-    }.iterator()
+    }
 }
 
 class HttpRequest(

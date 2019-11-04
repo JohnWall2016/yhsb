@@ -1,6 +1,7 @@
 import java.lang.Exception
 import java.util.*
 import kotlin.reflect.*
+import kotlin.sequences.*
 
 inline fun <reified T> value(): T? {
     return when (T::class) {
@@ -92,7 +93,7 @@ fun controlFlowTest() {
     }
 }
 
-fun iterateMethods(any: Any) = sequence {
+fun iterateMethods(any: Any) = iterator {
     when (any) {
         is KClass<*> -> {
             any.javaObjectType.methods
@@ -132,7 +133,7 @@ fun main() {
 //    genericTest()
 //    extensionTest()
 //    controlFlowTest()
-//    iterateTest()
+    iterateTest()
 //    classTest()
-    mapTest()
+//    mapTest()
 }
