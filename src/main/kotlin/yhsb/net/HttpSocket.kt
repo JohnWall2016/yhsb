@@ -7,8 +7,8 @@ import java.nio.charset.Charset
 import kotlin.sequences.iterator
 
 class HttpSocket(
-    private val ip: String,
-    private val port: Int,
+    ip: String,
+    port: Int,
     private val charset: Charset = Charsets.UTF_8
 ) : Closeable {
     private val socket = Socket(ip, port)
