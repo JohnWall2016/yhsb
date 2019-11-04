@@ -74,6 +74,22 @@ fun randomBool(): Boolean = Random().nextInt() % 2 == 1
 fun controlFlowTest() {
     val c = if (randomBool()) 'b' else null
     println(c)
+
+    run {
+        println("begin run")
+        end@ while(true) {
+            println("begin while")
+            when {
+                randomBool() -> {
+                    println("break")
+                    break@end
+                }
+                else -> println("continue")
+            }
+            println("end while")
+        }
+        println("end run")
+    }
 }
 
 fun iterateMethods(any: Any) = sequence {
@@ -101,7 +117,7 @@ fun iterateTest() {
 fun main() {
 //    genericTest()
 //    extensionTest()
-//    controlFlowTest()
+    controlFlowTest()
 //    iterateTest()
-    classTest()
+//    classTest()
 }
