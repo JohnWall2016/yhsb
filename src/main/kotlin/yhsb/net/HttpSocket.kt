@@ -15,7 +15,7 @@ class HttpSocket(
     private val ostream = socket.getOutputStream()
     private val istream = socket.getInputStream()
 
-    val url = "$ip:$port"
+    private val url = "$ip:$port"
 
     fun write(bytes: ByteArray) = ostream.write(bytes)
 
@@ -80,6 +80,7 @@ class HttpSocket(
     fun readHttpBody(header: HttpHeader? = null): String {
         return ByteArrayOutputStream().use {
             val header = header ?: readHttpHeader()
+            // header.forEach(::println)
             if (header["Transfer-Encoding"]?.contains("chunked") == true) {
                 while (true) {
                     val len = readLine().toInt(16)
@@ -110,6 +111,24 @@ class HttpSocket(
             }
         }
     }
+
+    fun getHttp(path: String, charset: Charset = Charsets.UTF_8): String {
+        val request = HttpRequest(path, method = "GET", charset = charset).apply {
+            addHeader("Host", url)
+            addHeader("Connection", "keep-alive")
+            addHeader("Cache-Control", "max-age=0")
+            addHeader("Upgrade-Insecure-Requests", "1")
+            addHeader(
+                "User-Agent",
+                "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36"
+            )
+            addHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8")
+            addHeader("Accept-Encoding", "gzip, deflate")
+            addHeader("Accept-Language", "zh-CN,zh;q=0.9")
+        }
+        write(request.toByteArray())
+        return readHttpBody()
+    }
 }
 
 class HttpHeader : Iterable<Map.Entry<String, List<String>>> {
@@ -129,7 +148,7 @@ class HttpHeader : Iterable<Map.Entry<String, List<String>>> {
         headers[key.toLowerCase()] = values
     }
 
-    operator fun get(key: String) = headers[key]
+    operator fun get(key: String) = headers[key.toLowerCase()]
 
     override fun iterator() = iterator {
         headers.forEach {
