@@ -114,10 +114,25 @@ fun iterateTest() {
     for (m in iterateMethods(1)) println(m)
 }
 
+fun mapTest() {
+    val map = mutableMapOf<Int, String>(
+        1 to "one",
+        2 to "two"
+    )
+    val map2 = mutableMapOf<Int, String>(
+        3 to "three",
+        4 to "four"
+    )
+    println(map)
+    map.putAll(map2)
+    println(map)
+}
+
 fun main() {
 //    genericTest()
 //    extensionTest()
-    controlFlowTest()
+//    controlFlowTest()
 //    iterateTest()
 //    classTest()
+    mapTest()
 }

@@ -5,8 +5,11 @@ import java.io.Closeable
 import java.net.Socket
 import java.nio.charset.Charset
 
-class HttpSocket(private val ip: String, private val port: Int, private val charset: Charset = Charsets.UTF_8) :
-    Closeable {
+class HttpSocket(
+    private val ip: String,
+    private val port: Int,
+    private val charset: Charset = Charsets.UTF_8
+) : Closeable {
     private val socket = Socket(ip, port)
     private val ostream = socket.getOutputStream()
     private val istream = socket.getInputStream()
@@ -108,7 +111,7 @@ class HttpSocket(private val ip: String, private val port: Int, private val char
     }
 }
 
-class HttpHeader {
+class HttpHeader : Iterable<Map.Entry<String, List<String>>> {
     private val headers = mutableMapOf<String, MutableList<String>>()
 
     fun add(name: String, value: String) {
@@ -119,13 +122,51 @@ class HttpHeader {
         headers[key]?.add(value)
     }
 
+    fun addAll(header: HttpHeader) = headers.putAll(header.headers)
+
     operator fun set(key: String, values: MutableList<String>) {
         headers[key.toLowerCase()] = values
     }
 
     operator fun get(key: String) = headers[key]
+
+    override fun iterator() = sequence {
+        headers.forEach {
+            yield(it)
+        }
+    }.iterator()
 }
 
-class HttpRequest {
+class HttpRequest(
+    private val path: String,
+    private val method: String = "GET",
+    private val charset: Charset = Charsets.UTF_8,
+    header: HttpHeader? = null
+) {
+    private val header = HttpHeader().apply {
+        if (header != null) addAll(header)
+    }
+    private val body = ByteArrayOutputStream()
 
+    fun addHeader(key: String, value: String) = header.add(key, value)
+
+    fun addBody(str: String) = body.write(str.toByteArray(charset))
+
+    fun toByteArray(): ByteArray {
+        val buf = ByteArrayOutputStream()
+        buf.write("$method $path HTTP/1.1\r\n".toByteArray(charset))
+        header.forEach { entry ->
+            entry.value.forEach { value ->
+                buf.write("${entry.key}: $value\r\n".toByteArray(charset))
+            }
+        }
+        if (body.size() > 0) {
+            buf.write("content-length: ${body.size()}\r\n".toByteArray(charset))
+        }
+        buf.write("\r\n".toByteArray(charset))
+        if (body.size() > 0) {
+            buf.write(body.toByteArray())
+        }
+        return buf.toByteArray()
+    }
 }
