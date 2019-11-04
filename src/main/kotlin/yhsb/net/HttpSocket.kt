@@ -17,7 +17,7 @@ class HttpSocket(
 
     private val url = "$ip:$port"
 
-    fun write(bytes: ByteArray) = ostream.write(bytes)
+    private fun write(bytes: ByteArray) = ostream.write(bytes)
 
     fun write(string: String) = ostream.write(string.toByteArray(charset))
 
