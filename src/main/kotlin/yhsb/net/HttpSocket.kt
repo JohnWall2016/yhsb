@@ -6,18 +6,18 @@ import java.net.Socket
 import java.nio.charset.Charset
 import kotlin.sequences.iterator
 
-class HttpSocket(
-    ip: String,
+open class HttpSocket(
+    host: String,
     port: Int,
     private val charset: Charset = Charsets.UTF_8
 ) : Closeable {
-    private val socket = Socket(ip, port)
+    private val socket = Socket(host, port)
     private val ostream = socket.getOutputStream()
     private val istream = socket.getInputStream()
 
-    private val url = "$ip:$port"
+    public val url = "$host:$port"
 
-    private fun write(bytes: ByteArray) = ostream.write(bytes)
+    protected fun write(bytes: ByteArray) = ostream.write(bytes)
 
     fun write(string: String) = ostream.write(string.toByteArray(charset))
 
@@ -42,7 +42,7 @@ class HttpSocket(
             end@ while (true) {
                 when (val c = read()) {
                     -1 -> break@end
-                    0x0D -> // \r
+                    0x0D -> {// \r
                         when (val n = read()) {
                             -1 -> {
                                 it.write(c)
@@ -55,6 +55,7 @@ class HttpSocket(
                                 it.write(n)
                             }
                         }
+                    }
                     else -> it.write(c)
                 }
             }
